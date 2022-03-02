@@ -6,7 +6,7 @@
         <sourceOutputDir name="target/generated-sources/annotations" />
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
-        <module name="PP_1.1.3.4" />
+        <module name="PP_1_1_3-4_JDBC_Hibernate" />
       </profile>
     </annotationProcessing>
   </component>
