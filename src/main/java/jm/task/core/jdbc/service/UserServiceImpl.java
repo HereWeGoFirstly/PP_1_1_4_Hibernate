@@ -1,12 +1,15 @@
 package jm.task.core.jdbc.service;
 
+import jm.task.core.jdbc.dao.UserDao;
 import jm.task.core.jdbc.dao.UserDaoJDBCImpl;
 import jm.task.core.jdbc.model.User;
 
+import java.io.Closeable;
+import java.io.IOException;
 import java.util.List;
 
-public class UserServiceImpl implements UserService {
-    UserDaoJDBCImpl userDaoJDBC = new UserDaoJDBCImpl();
+public class UserServiceImpl implements UserService, Closeable {
+    UserDao userDaoJDBC = new UserDaoJDBCImpl();
 
     public void createUsersTable() {
         userDaoJDBC.createUsersTable();
@@ -30,5 +33,15 @@ public class UserServiceImpl implements UserService {
 
     public void cleanUsersTable() {
         userDaoJDBC.cleanUsersTable();
+    }
+
+    public void close() {
+        if (userDaoJDBC != null) {
+            try {
+                userDaoJDBC.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

@@ -10,21 +10,11 @@ public class Util {
     public static Connection getConnection() {
         Connection connection = null;
         try {
+            Class.forName("com.mysql.jdbc.Driver");
             connection = DriverManager.getConnection(URL, USER, PASSWORD);
-        } catch (SQLException e) {
+        } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
         }
         return connection;
-    }
-
-    public static long getCount(Connection connection) throws SQLException {
-        long count = 0;
-        Statement statement = connection.createStatement();
-        ResultSet resultSet = statement.executeQuery("SELECT * " +
-                "FROM usertable");
-        while (resultSet.next()) {
-            count++;
-        }
-        return count;
     }
 }
