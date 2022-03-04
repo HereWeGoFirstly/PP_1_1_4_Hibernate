@@ -5,7 +5,7 @@ import jm.task.core.jdbc.model.User;
 import java.sql.SQLException;
 import java.util.List;
 
-public interface UserDao extends AutoCloseable {
+public interface UserDao {
     void createUsersTable();
 
     void dropUsersTable();
