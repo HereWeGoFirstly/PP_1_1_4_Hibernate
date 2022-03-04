@@ -4,11 +4,9 @@ import jm.task.core.jdbc.dao.UserDao;
 import jm.task.core.jdbc.dao.UserDaoJDBCImpl;
 import jm.task.core.jdbc.model.User;
 
-import java.io.Closeable;
-import java.io.IOException;
 import java.util.List;
 
-public class UserServiceImpl implements UserService, Closeable {
+public class UserServiceImpl implements UserService, AutoCloseable {
     UserDao userDaoJDBC = new UserDaoJDBCImpl();
 
     public void createUsersTable() {
@@ -35,6 +33,7 @@ public class UserServiceImpl implements UserService, Closeable {
         userDaoJDBC.cleanUsersTable();
     }
 
+    @Override
     public void close() {
         if (userDaoJDBC != null) {
             try {

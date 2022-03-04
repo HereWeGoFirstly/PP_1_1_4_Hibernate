@@ -7,12 +7,16 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class UserDaoJDBCImpl implements UserDao {
+public class UserDaoJDBCImpl implements UserDao, AutoCloseable {
     Connection connection;
 
     public UserDaoJDBCImpl() {
         connection = Util.getConnection();
-        setAutocommitNo();
+        try {
+            connection.setAutoCommit(false);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     public void createUsersTable() {
@@ -23,9 +27,13 @@ public class UserDaoJDBCImpl implements UserDao {
                 "age int);";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.executeUpdate();
-            commit();
+            connection.commit();
         } catch (SQLException e) {
-            rollback();
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
             e.printStackTrace();
         }
     }
@@ -34,8 +42,13 @@ public class UserDaoJDBCImpl implements UserDao {
         String sql = "DROP TABLE IF EXISTS usertable;";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.executeUpdate();
-            commit();
+            connection.commit();
         } catch (SQLException ex) {
+            try {
+                connection.rollback();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
             ex.printStackTrace();
         }
     }
@@ -48,10 +61,14 @@ public class UserDaoJDBCImpl implements UserDao {
             preparedStatement.setString(3, lastName);
             preparedStatement.setInt(4, age);
             preparedStatement.executeUpdate();
-            commit();
+            connection.commit();
             System.out.printf("User с именем – %s добавлен в базу данных\n", name);
         } catch (SQLException e) {
-            rollback();
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
             e.printStackTrace();
         }
     }
@@ -61,9 +78,13 @@ public class UserDaoJDBCImpl implements UserDao {
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.setLong(1, id);
             preparedStatement.executeUpdate();
-            commit();
+            connection.commit();
         } catch (SQLException e) {
-            rollback();
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
             e.printStackTrace();
         }
     }
@@ -82,8 +103,13 @@ public class UserDaoJDBCImpl implements UserDao {
                 users.get(i).setAge(resultSet.getByte("age"));
                 i++;
             }
-            commit();
+            connection.commit();
         } catch (SQLException e) {
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
             e.printStackTrace();
         }
         return users;
@@ -93,8 +119,13 @@ public class UserDaoJDBCImpl implements UserDao {
         String sql = "DELETE FROM usertable;";
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             preparedStatement.executeUpdate();
-            commit();
+            connection.commit();
         } catch (SQLException e) {
+            try {
+                connection.rollback();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
             e.printStackTrace();
         }
     }
@@ -107,38 +138,12 @@ public class UserDaoJDBCImpl implements UserDao {
             while (resultSet.next()) {
                 count++;
             }
-            commit();
+            connection.commit();
         }
         return count;
     }
 
-    public void rollback() {
-        String sql = "ROLLBACK;";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void commit() {
-        String sql = "COMMIT;";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void setAutocommitNo() {
-        String sql = "SET AUTOCOMMIT = 0;";
-        try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
-            preparedStatement.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
+    @Override
     public void close() {
         if (connection != null) {
             try {
