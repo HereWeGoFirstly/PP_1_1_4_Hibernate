@@ -101,7 +101,7 @@ public class UserDaoJDBCImpl implements UserDao {
         }
     }
 
-    public long getCount() throws SQLException {
+    private long getCount() throws SQLException {
         long count = 0;
         String sql = "SELECT * FROM usertable;";
         try (Connection connection = Util.getConnection();
