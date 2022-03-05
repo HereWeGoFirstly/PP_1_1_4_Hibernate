@@ -14,7 +14,6 @@ public class UserDaoHibernateImpl implements UserDao {
     Transaction transaction = null;
 
     public UserDaoHibernateImpl() {
-
     }
 
     @Override
