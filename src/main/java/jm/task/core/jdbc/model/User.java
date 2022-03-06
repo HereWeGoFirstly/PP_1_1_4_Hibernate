@@ -7,7 +7,6 @@ import java.util.Objects;
 @Table(name = "usertable")
 public class User {
     @Id
-    @GeneratedValue
     private Long id;
 
     @Column
