@@ -13,7 +13,8 @@ public class UserDaoHibernateImpl implements UserDao {
 
     @Override
     public void createUsersTable() {
-        try (Session session = Util.getSessionFactory().openSession()) {
+        Session session = Util.getSessionFactory().openSession();
+        try {
             session.beginTransaction();
             session.createSQLQuery("CREATE TABLE IF NOT EXISTS usertable (" +
                     "id bigint," +
@@ -23,23 +24,31 @@ public class UserDaoHibernateImpl implements UserDao {
             session.getTransaction().commit();
         } catch (HibernateException e) {
             e.printStackTrace();
+            session.getTransaction().rollback();
+        } finally {
+            session.close();
         }
     }
 
     @Override
     public void dropUsersTable() {
-        try (Session session = Util.getSessionFactory().openSession()) {
+        Session session = Util.getSessionFactory().openSession();
+        try {
             session.beginTransaction();
             session.createSQLQuery("DROP TABLE IF EXISTS usertable").addEntity(User.class).executeUpdate();
             session.getTransaction().commit();
         } catch (HibernateException e) {
+            session.getTransaction().rollback();
             e.printStackTrace();
+        } finally {
+            session.close();
         }
     }
 
     @Override
     public void saveUser(String name, String lastName, byte age) {
-        try (Session session = Util.getSessionFactory().openSession()) {
+        Session session = Util.getSessionFactory().openSession();
+        try {
             session.beginTransaction();
             User user = new User(name, lastName, age);
             user.setId(getAllUsers().size() + 1L);
@@ -47,37 +56,54 @@ public class UserDaoHibernateImpl implements UserDao {
             session.getTransaction().commit();
             System.out.printf("User с именем – %s добавлен в базу данных\n", name);
         } catch (HibernateException e) {
+            session.getTransaction().rollback();
             e.printStackTrace();
+        } finally {
+            session.close();
         }
     }
 
     @Override
     public void removeUserById(long id) {
-        try (Session session = Util.getSessionFactory().openSession()) {
+        Session session = Util.getSessionFactory().openSession();
+        try {
             session.beginTransaction();
             session.delete(session.get(User.class, id));
             session.getTransaction().commit();
         } catch (HibernateException e) {
+            session.getTransaction().rollback();
             e.printStackTrace();
+        } finally {
+            session.close();
         }
     }
 
     @Override
     public List<User> getAllUsers() {
-        try (Session session = Util.getSessionFactory().openSession()) {
+        Session session = Util.getSessionFactory().openSession();
+        try {
             return session.createQuery("SELECT u FROM User u", User.class).getResultList();
         } catch (HibernateException e) {
+            session.getTransaction().rollback();
             e.printStackTrace();
+        } finally {
+            session.close();
         }
         return null;
     }
 
     @Override
     public void cleanUsersTable() {
-        try (Session session = Util.getSessionFactory().openSession()) {
+        Session session = Util.getSessionFactory().openSession();
+        try {
             session.beginTransaction();
             session.createSQLQuery("TRUNCATE usertable").addEntity(User.class).executeUpdate();
             session.getTransaction().commit();
+        } catch (HibernateException e) {
+            session.getTransaction().rollback();
+            e.printStackTrace();
+        } finally {
+            session.close();
         }
     }
 }
